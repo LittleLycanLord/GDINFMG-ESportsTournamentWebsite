@@ -17,9 +17,22 @@ document.addEventListener("DOMContentLoaded", () => {
 			await handleCreateTournament();
 		});
 	}
-});
 
-/* -------------------------
+	// Event delegation for tournament view links
+	document.addEventListener("click", (e) => {
+		if (e.target.classList.contains("view-tournament")) {
+			e.preventDefault();
+			const tournamentId = e.target.dataset.tournamentId;
+			if (tournamentId) {
+				// For now, just log - you can implement a modal or detail view later
+				console.log("View tournament:", tournamentId);
+				alert(
+					`Tournament ID: ${tournamentId}\n\nDetail view coming soon!`
+				);
+			}
+		}
+	});
+}); /* -------------------------
    TOURNAMENTS
    ------------------------- */
 export async function renderTournaments() {
@@ -48,7 +61,10 @@ export async function renderTournaments() {
 
 	if (error) {
 		console.error("Error fetching tournaments:", error);
-		container.innerHTML = `<div class="box has-background-dark has-text-white">Error loading tournaments. See console for details.</div>`;
+		container.innerHTML = `<div class="notification is-danger">
+			<strong>Error loading tournaments</strong><br>
+			${escapeHtml(error.message || "Unknown error occurred")}
+		</div>`;
 		return;
 	}
 
@@ -254,7 +270,10 @@ export async function renderTeams() {
 
 	if (error) {
 		console.error("Error loading teams:", error);
-		container.innerHTML = `<div class="box has-background-dark has-text-white">Error loading teams.</div>`;
+		container.innerHTML = `<div class="notification is-danger">
+			<strong>Error loading teams</strong><br>
+			${escapeHtml(error.message || "Unknown error occurred")}
+		</div>`;
 		return;
 	}
 
@@ -301,7 +320,10 @@ export async function renderPlayers() {
 
 	if (error) {
 		console.error("Error loading players:", error);
-		container.innerHTML = `<div class="box has-background-dark has-text-white">Error loading players.</div>`;
+		container.innerHTML = `<div class="notification is-danger">
+			<strong>Error loading players</strong><br>
+			${escapeHtml(error.message || "Unknown error occurred")}
+		</div>`;
 		return;
 	}
 
@@ -365,7 +387,10 @@ export async function renderEventParticipants(event_id) {
 
 	if (error) {
 		console.error("Error loading event participants:", error);
-		container.innerHTML = `<div class="box has-background-dark has-text-white">Error loading participants.</div>`;
+		container.innerHTML = `<div class="notification is-danger">
+			<strong>Error loading participants</strong><br>
+			${escapeHtml(error.message || "Unknown error occurred")}
+		</div>`;
 		return;
 	}
 
