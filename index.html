@@ -87,7 +87,8 @@
     <p>© <span id="year"></span> GDINFMG Esports Tournament Website</p>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- load frontend as ESM module -->
+  <script type="module" src="script.js"></script>
   <script>
     document.getElementById('year').innerText = new Date().getFullYear();
   </script>
