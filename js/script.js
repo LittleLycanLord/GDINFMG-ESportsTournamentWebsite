@@ -2,7 +2,7 @@
 // Assumes js/supabase.js exports `supabase` (createClient)
 // Works with your DDL table/column names exactly as provided.
 
-import { supabase } from "./js/supabase.js";
+import { supabase } from "./supabase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 	// load initial UI
