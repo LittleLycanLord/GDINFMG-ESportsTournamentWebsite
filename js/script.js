@@ -4,6 +4,10 @@
 
 import { supabase } from "./supabase.js";
 
+// Debug: Verify supabase client is initialized
+console.log("Supabase client initialized:", !!supabase);
+console.log("Supabase URL configured:", supabase?.supabaseUrl);
+
 document.addEventListener("DOMContentLoaded", () => {
 	// load initial UI
 	renderTournaments();
