@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDINFMG Esports Tournament</title>
+
+  <!-- Bulma CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+  <style>
+    body {
+      background: #0d1117;
+      color: #ffffff;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, #111827, #0d1117);
+    }
+
+    .navbar {
+      background-color: #1f2937 !important;
+    }
+
+    .navbar-item, .navbar-link {
+      color: #fff !important;
+    }
+
+    footer {
+      background: #111827;
+      padding: 2rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item has-text-weight-bold">GDINFMG Esports</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero is-medium">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title has-text-white">GDINFMG Esports Tournament</h1>
+        <h2 class="subtitle has-text-grey-light">
+          Competitive • Organized • Community-Driven
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION -->
+  <section class="section">
+    <div class="container">
+
+      <h3 class="title is-4 has-text-white">Upcoming Tournaments</h3>
+
+      <div id="tournament-list">
+        <div class="box has-background-dark has-text-white">
+          Loading tournaments...
+        </div>
+      </div>
+
+      <hr>
+
+      <h3 class="title is-4 has-text-white">Teams</h3>
+
+      <div id="teams-list" class="columns is-multiline">
+        <div class="column is-4">
+          <div class="box has-background-dark has-text-white">
+            <h4 class="title is-5">Sample Team</h4>
+            <p class="has-text-grey-light">Roster coming soon.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer has-text-centered">
+    <p>© <span id="year"></span> GDINFMG Esports Tournament Website</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    document.getElementById('year').innerText = new Date().getFullYear();
+  </script>
+</body>
+</html>
