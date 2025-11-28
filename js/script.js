@@ -57,7 +57,6 @@ export async function renderTournaments() {
       schedule,
       created_at,
       updated_at,
-      -- fetch related events count (optional)
       events:events(id, event_code, name, game_title, schedule)
     `
 		)
