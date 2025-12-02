@@ -47,17 +47,20 @@ async function initAuthUI() {
 		loginTab.parentElement.classList.remove("is-active");
 	});
 
-	// Login submit
+	// Login submit (username-based)
 	submitLoginBtn.addEventListener("click", async () => {
-		const email = document.getElementById("loginEmail").value.trim();
+		const username = document.getElementById("loginUsername").value.trim();
 		const password = document.getElementById("loginPassword").value.trim();
 		const errorEl = document.getElementById("loginError");
 		errorEl.innerText = "";
 
-		if (!email || !password) {
-			errorEl.innerText = "Please enter email and password";
+		if (!username || !password) {
+			errorEl.innerText = "Please enter username and password";
 			return;
 		}
+
+		// synthesize an email for Supabase auth (client-only mapping)
+		const email = username + "@local.gdin";
 
 		try {
 			const { data, error } = await supabase.auth.signInWithPassword({
@@ -78,9 +81,9 @@ async function initAuthUI() {
 		}
 	});
 
-	// Signup submit
+	// Signup submit (username-based)
 	submitSignupBtn.addEventListener("click", async () => {
-		const email = document.getElementById("signupEmail").value.trim();
+		const username = document.getElementById("signupUsername").value.trim();
 		const password = document.getElementById("signupPassword").value.trim();
 		const passwordConfirm = document
 			.getElementById("signupPasswordConfirm")
@@ -88,7 +91,7 @@ async function initAuthUI() {
 		const errorEl = document.getElementById("signupError");
 		errorEl.innerText = "";
 
-		if (!email || !password || !passwordConfirm) {
+		if (!username || !password || !passwordConfirm) {
 			errorEl.innerText = "Please fill in all fields";
 			return;
 		}
@@ -103,6 +106,9 @@ async function initAuthUI() {
 			return;
 		}
 
+		// synthesize an email for Supabase auth (client-only mapping)
+		const email = username + "@local.gdin";
+
 		try {
 			const { data, error } = await supabase.auth.signUp({
 				email,
@@ -116,7 +122,7 @@ async function initAuthUI() {
 
 			console.log("Signup successful:", data.user.email);
 			alert(
-				"Sign up successful! Please check your email for verification."
+				"Sign up successful! You can now log in with your username and password."
 			);
 			loginModal.classList.remove("is-active");
 		} catch (err) {
@@ -141,15 +147,18 @@ async function checkAuthState() {
 	const loginBtn = document.getElementById("loginBtn");
 	const logoutBtn = document.getElementById("logoutBtn");
 	const userInfo = document.getElementById("userInfo");
-	const userEmail = document.getElementById("userEmail");
+	const userName = document.getElementById("userName");
 
 	if (data.session) {
 		// User is logged in
 		loginBtn.style.display = "none";
 		logoutBtn.style.display = "block";
 		userInfo.style.display = "block";
-		userEmail.innerText = data.session.user.email;
-		console.log("User logged in:", data.session.user.email);
+		// display the username portion we synthesize (before the @)
+		const email = data.session.user.email || "";
+		const username = email.split("@")[0];
+		userName.innerText = username;
+		console.log("User logged in (username):", username);
 	} else {
 		// User is not logged in
 		loginBtn.style.display = "block";
