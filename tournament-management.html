@@ -44,6 +44,7 @@
       <div class="navbar-start">
         <a class="navbar-item" href="index.html">Home</a>
         <a class="navbar-item" href="tournament-management.html">Tournament Management</a>
+        <a class="navbar-item" href="participant-management.html">Participant Management</a>
       </div>
     </div>
   </nav>
@@ -64,6 +65,16 @@
   <section class="section">
     <div class="container">
 
+      <!-- EXISTING TOURNAMENTS LIST -->
+      <div class="box has-background-grey-dark mb-5">
+        <h3 class="title is-4 has-text-white">Existing Tournaments</h3>
+        <div id="tournaments-list">
+          <div class="has-text-white">Loading tournaments...</div>
+        </div>
+      </div>
+
+      <hr>
+
       <!-- CREATE TOURNAMENT FORM -->
       <div class="box has-background-grey-dark">
         <h3 class="title is-4 has-text-white">Create Tournament</h3>
@@ -72,13 +83,6 @@
           <label class="label has-text-white">Tournament Name</label>
           <div class="control">
             <input class="input" type="text" id="tname" placeholder="e.g., Summer Championship 2025">
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label has-text-white">Registration Date</label>
-          <div class="control">
-            <input class="input" type="date" id="tdate">
           </div>
         </div>
 
@@ -106,6 +110,20 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <hr class="has-background-grey">
+
+        <!-- TOURNAMENT SPONSORS SECTION -->
+        <div class="mb-4" id="tournament-sponsors-section">
+          <h4 class="title is-5 has-text-white">Tournament Sponsors</h4>
+          <div id="tournament-sponsors-container">
+            <!-- Sponsors will be added here dynamically -->
+          </div>
+          <button class="button is-info is-light" id="addTournamentSponsorBtn" type="button">
+            <span class="icon"><i>+</i></span>
+            <span>Add Sponsor</span>
+          </button>
         </div>
 
         <hr class="has-background-grey">

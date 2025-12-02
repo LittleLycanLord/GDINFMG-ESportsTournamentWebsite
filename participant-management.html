@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Participant Management - GDINFMG Esports</title>
+
+  <!-- Bulma CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+  <style>
+    body {
+      background: #0d1117;
+      color: #ffffff;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, #111827, #0d1117);
+    }
+
+    .navbar {
+      background-color: #1f2937 !important;
+    }
+
+    .navbar-item, .navbar-link {
+      color: #fff !important;
+    }
+
+    footer {
+      background: #111827;
+      padding: 2rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item has-text-weight-bold" href="index.html">GDINFMG Esports</a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="index.html">Home</a>
+        <a class="navbar-item" href="tournament-management.html">Tournament Management</a>
+        <a class="navbar-item" href="participant-management.html">Participant Management</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title has-text-white">Participant Management</h1>
+        <h2 class="subtitle has-text-grey-light">
+          Manage event participants and assign seeds
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION -->
+  <section class="section">
+    <div class="container">
+
+      <!-- SELECT TOURNAMENT AND EVENT -->
+      <div class="box has-background-grey-dark mb-5">
+        <h3 class="title is-4 has-text-white">Select Event</h3>
+        
+        <div class="field">
+          <label class="label has-text-white">Tournament</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select id="tournament-select">
+                <option value="">Loading tournaments...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label has-text-white">Event</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select id="event-select" disabled>
+                <option value="">Select a tournament first</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-primary" id="load-participants-btn" disabled>Load Participants</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXISTING PARTICIPANTS -->
+      <div class="box has-background-grey-dark mb-5" id="participants-section" style="display: none;">
+        <h3 class="title is-4 has-text-white">Event Participants</h3>
+        <div id="participants-list">
+          <div class="has-text-white">No participants yet.</div>
+        </div>
+      </div>
+
+      <hr id="participants-divider" style="display: none;">
+
+      <!-- ADD PARTICIPANT FORM -->
+      <div class="box has-background-grey-dark" id="add-participant-section" style="display: none;">
+        <h3 class="title is-4 has-text-white">Add Participant</h3>
+        
+        <div class="field">
+          <label class="label has-text-white">Participant Type</label>
+          <div class="control">
+            <label class="radio has-text-white">
+              <input type="radio" name="participant-type" value="player" checked>
+              Individual Player
+            </label>
+            <label class="radio has-text-white">
+              <input type="radio" name="participant-type" value="team">
+              Team
+            </label>
+          </div>
+        </div>
+
+        <!-- PLAYER FORM -->
+        <div id="player-form">
+          <div class="field">
+            <label class="label has-text-white">Player Selection</label>
+            <div class="control">
+              <label class="radio has-text-white">
+                <input type="radio" name="player-selection" value="existing" checked>
+                Select Existing Player
+              </label>
+              <label class="radio has-text-white">
+                <input type="radio" name="player-selection" value="new">
+                Create New Player
+              </label>
+            </div>
+          </div>
+
+          <div id="existing-player-section">
+            <div class="field">
+              <label class="label has-text-white">Select Player</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select id="player-select">
+                    <option value="">Loading players...</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="new-player-section" style="display: none;">
+            <div class="field">
+              <label class="label has-text-white">Player Name</label>
+              <div class="control">
+                <input class="input" type="text" id="new-player-name" placeholder="e.g., PlayerOne">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label has-text-white">Region</label>
+              <div class="control">
+                <input class="input" type="text" id="new-player-region" placeholder="e.g., NA, EU, SEA">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEAM FORM -->
+        <div id="team-form" style="display: none;">
+          <div class="field">
+            <label class="label has-text-white">Team Selection</label>
+            <div class="control">
+              <label class="radio has-text-white">
+                <input type="radio" name="team-selection" value="existing" checked>
+                Select Existing Team
+              </label>
+              <label class="radio has-text-white">
+                <input type="radio" name="team-selection" value="new">
+                Create New Team
+              </label>
+            </div>
+          </div>
+
+          <div id="existing-team-section">
+            <div class="field">
+              <label class="label has-text-white">Select Team</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select id="team-select">
+                    <option value="">Loading teams...</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="new-team-section" style="display: none;">
+            <div class="field">
+              <label class="label has-text-white">Team Name</label>
+              <div class="control">
+                <input class="input" type="text" id="new-team-name" placeholder="e.g., Team Alpha">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label has-text-white">Region</label>
+              <div class="control">
+                <input class="input" type="text" id="new-team-region" placeholder="e.g., NA, EU, SEA">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label has-text-white">Team Leader</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select id="team-leader-select">
+                    <option value="">Loading players...</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <hr class="has-background-grey">
+            <h5 class="title is-6 has-text-white">Team Members</h5>
+            <div id="team-members-container">
+              <!-- Team members will be added here -->
+            </div>
+            <button class="button is-small is-info" id="add-team-member-btn" type="button">
+              <span class="icon"><i>+</i></span>
+              <span>Add Team Member</span>
+            </button>
+          </div>
+        </div>
+
+        <hr class="has-background-grey">
+
+        <div class="field">
+          <label class="label has-text-white">Seed</label>
+          <div class="control">
+            <input class="input" type="number" id="participant-seed" placeholder="e.g., 1, 2, 3..." min="1">
+          </div>
+          <p class="help has-text-grey-light">Seed determines bracket placement. Leave empty for auto-assignment.</p>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-primary is-large" id="add-participant-btn">Add Participant</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer has-text-centered">
+    <p>© <span id="year"></span> GDINFMG Esports Tournament Website</p>
+  </footer>
+
+  <!-- load frontend as ESM module -->
+  <script type="module" src="js/participant-management.js"></script>
+  <script>
+    document.getElementById('year').innerText = new Date().getFullYear();
+  </script>
+</body>
+</html>
