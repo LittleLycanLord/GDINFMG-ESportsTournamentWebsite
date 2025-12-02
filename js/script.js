@@ -14,14 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	renderTeams();
 	renderPlayers();
 
-	// wired to temp form in index.html (if present)
-	const createBtn = document.getElementById("createTournamentBtn");
-	if (createBtn) {
-		createBtn.addEventListener("click", async () => {
-			await handleCreateTournament();
-		});
-	}
-
 	// Event delegation for tournament view links
 	document.addEventListener("click", (e) => {
 		if (e.target.classList.contains("view-tournament")) {
