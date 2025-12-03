@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournament Management - GDINFMG Esports</title>
+
+  <!-- Bulma CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+  <style>
+    body {
+      background: #0d1117;
+      color: #ffffff;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, #111827, #0d1117);
+    }
+
+    .navbar {
+      background-color: #1f2937 !important;
+    }
+
+    .navbar-item, .navbar-link {
+      color: #fff !important;
+    }
+
+    footer {
+      background: #111827;
+      padding: 2rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item has-text-weight-bold" href="index.html">GDINFMG Esports</a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="index.html">Home</a>
+        <a class="navbar-item" href="tournament-management.html">Tournament Management</a>
+        <a class="navbar-item" href="participant-management.html">Participant Management</a>
+        <a class="navbar-item" href="bracket-management.html">Bracket Management</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title has-text-white">Tournament Management</h1>
+        <h2 class="subtitle has-text-grey-light">
+          Create and manage tournaments, events, and prizes
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION -->
+  <section class="section">
+    <div class="container">
+
+      <!-- EXISTING TOURNAMENTS LIST -->
+      <div class="box has-background-grey-dark mb-5">
+        <h3 class="title is-4 has-text-white">Existing Tournaments</h3>
+        <div id="tournaments-list">
+          <div class="has-text-white">Loading tournaments...</div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- CREATE TOURNAMENT FORM -->
+      <div class="box has-background-grey-dark">
+        <h3 class="title is-4 has-text-white">Create Tournament</h3>
+        
+        <div class="field">
+          <label class="label has-text-white">Tournament Name</label>
+          <div class="control">
+            <input class="input" type="text" id="tname" placeholder="e.g., Summer Championship 2025">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label has-text-white">Location</label>
+          <div class="control">
+            <input class="input" type="text" id="tlocation" placeholder="e.g., Main Arena">
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column">
+            <div class="field">
+              <label class="label has-text-white">Schedule Start</label>
+              <div class="control">
+                <input class="input" type="datetime-local" id="schedule_start">
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="field">
+              <label class="label has-text-white">Schedule End</label>
+              <div class="control">
+                <input class="input" type="datetime-local" id="schedule_end">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="has-background-grey">
+
+        <!-- TOURNAMENT SPONSORS SECTION -->
+        <div class="mb-4" id="tournament-sponsors-section">
+          <h4 class="title is-5 has-text-white">Tournament Sponsors</h4>
+          <div id="tournament-sponsors-container">
+            <!-- Sponsors will be added here dynamically -->
+          </div>
+          <button class="button is-info is-light" id="addTournamentSponsorBtn" type="button">
+            <span class="icon"><i>+</i></span>
+            <span>Add Sponsor</span>
+          </button>
+        </div>
+
+        <hr class="has-background-grey">
+
+        <!-- EVENTS SECTION -->
+        <div class="mb-4">
+          <h4 class="title is-5 has-text-white">Events</h4>
+          <div id="events-container">
+            <!-- Events will be added here dynamically -->
+          </div>
+          <button class="button is-info is-light" id="addEventBtn" type="button">
+            <span class="icon"><i>+</i></span>
+            <span>Add Event</span>
+          </button>
+        </div>
+
+        <hr class="has-background-grey">
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-primary is-large" id="createTournamentBtn">Create Tournament with Events</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer has-text-centered">
+    <p>© <span id="year"></span> GDINFMG Esports Tournament Website</p>
+  </footer>
+
+  <!-- load frontend as ESM module -->
+  <script type="module" src="js/tournament-management.js"></script>
+  <script>
+    document.getElementById('year').innerText = new Date().getFullYear();
+  </script>
+</body>
+</html>
