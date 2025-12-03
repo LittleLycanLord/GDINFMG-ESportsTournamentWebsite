@@ -389,75 +389,126 @@ export async function renderTournaments() {
         followedTournamentIds = followedData?.map(f => f.item_id) || [];
     }
 
-	// render result grid
+	// render accordion-style tournament list
 	container.innerHTML = "";
-	const cols = document.createElement("div");
-	cols.className = "columns is-multiline";
+	const accordionContainer = document.createElement("div");
+	accordionContainer.className = "tournament-accordion";
 
 	data.forEach((t) => {
 		const sch = formatRange(t.schedule);
 		const regDate = formatDateTime(t.registration_date);
 		const isFollowed = followedTournamentIds.includes(t.id);
+		
 		const eventsHtml =
 			t.events && t.events.length
 				? `
-      <div class="content">
-        <strong>Events</strong>
-        <ul>
-          ${t.events
-				.map(
-					(e) =>
-						`<li>${escapeHtml(e.name)} (${escapeHtml(
-							e.game_title
-						)}) — ${formatRange(e.schedule)}</li>`
-				)
-				.join("")}
-        </ul>
-      </div>`
-				: `<p class="has-text-grey">No events</p>`;
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Event Lineup</strong>
+            <ul class="event-list">
+              ${t.events
+					.map(
+						(e) =>
+							`<li>
+								<span class="event-name">${escapeHtml(e.name)}</span>
+								<span class="event-game">${escapeHtml(e.game_title)}</span>
+								<span class="event-schedule">${formatRange(e.schedule)}</span>
+							</li>`
+					)
+					.join("")}
+            </ul>
+          </div>`
+				: `<div class="tournament-detail-item"><p class="has-text-grey">No events scheduled</p></div>`;
 
-		const col = document.createElement("div");
-		col.className = "column is-one-third";
-		col.innerHTML = `
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">${escapeHtml(t.name)}</p>
-        </header>
-        <div class="card-content">
-          <div class="content">
-            <p><strong>Code:</strong> ${escapeHtml(t.tournament_code || "")}</p>
-            <p><strong>Reg Date:</strong> ${escapeHtml(regDate)}</p>
-            <p><strong>Location:</strong> ${escapeHtml(t.location || "")}</p>
-            <p><strong>Schedule:</strong> ${escapeHtml(sch)}</p>
-            ${eventsHtml}
+		const tournamentItem = document.createElement("div");
+		tournamentItem.className = "tournament-item";
+		tournamentItem.dataset.tournamentId = t.id;
+		tournamentItem.innerHTML = `
+      <button class="tournament-header" data-tournament-id="${t.id}">
+        <div class="tournament-header-content">
+          <h3 class="tournament-name">${escapeHtml(t.name)}</h3>
+          <span class="tournament-location">${escapeHtml(t.location || "Location TBD")}</span>
+        </div>
+        <span class="expand-icon">▼</span>
+      </button>
+      <div class="tournament-details" style="display: none;">
+        <div class="tournament-details-grid">
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Tournament Code</strong>
+            <p>${escapeHtml(t.tournament_code || "N/A")}</p>
+          </div>
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Registration Date</strong>
+            <p>${escapeHtml(regDate)}</p>
+          </div>
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Schedule</strong>
+            <p>${escapeHtml(sch)}</p>
+          </div>
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Location</strong>
+            <p>${escapeHtml(t.location || "TBD")}</p>
+          </div>
+          ${eventsHtml}
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Sponsors</strong>
+            <p class="has-text-grey">Coming soon</p>
           </div>
         </div>
-        <footer class="card-footer">
-          <a class="card-footer-item" href="#" data-id="${
-				t.id
-			}" onclick="window.open('/?tournament=' + '${
-			t.id
-		}', '_blank')">Open</a>
-		${currentUserId ? `<button class="card-footer-item follow-btn" data-item-id="${t.id}" data-item-type="tournament" style="background: none; border: none; color: #3273dc; cursor: pointer;">
+        <div class="tournament-actions">
+          ${currentUserId ? `<button class="button is-small follow-btn" data-item-id="${t.id}" data-item-type="tournament">
             ${isFollowed ? '★ Following' : '☆ Follow'}
           </button>` : ''}
-        </footer>
+        </div>
       </div>
     `;
-		cols.appendChild(col);
+		accordionContainer.appendChild(tournamentItem);
 	});
 
-	container.appendChild(cols);
+	container.appendChild(accordionContainer);
+
+	// Add event listeners for accordion toggle
+	document.querySelectorAll(".tournament-header").forEach((btn) => {
+		btn.addEventListener("click", (e) => {
+			const tournamentId = btn.dataset.tournamentId;
+			const tournamentItem = btn.closest(".tournament-item");
+			const details = tournamentItem.querySelector(".tournament-details");
+			const icon = btn.querySelector(".expand-icon");
+			const isExpanded = details.style.display !== "none";
+
+			// Collapse all other tournaments
+			document.querySelectorAll(".tournament-item").forEach((item) => {
+				if (item.dataset.tournamentId !== tournamentId) {
+					const otherDetails = item.querySelector(".tournament-details");
+					const otherIcon = item.querySelector(".expand-icon");
+					otherDetails.style.display = "none";
+					otherIcon.textContent = "▼";
+					item.classList.remove("expanded");
+				}
+			});
+
+			// Toggle current tournament
+			if (isExpanded) {
+				details.style.display = "none";
+				icon.textContent = "▼";
+				tournamentItem.classList.remove("expanded");
+			} else {
+				details.style.display = "block";
+				icon.textContent = "▲";
+				tournamentItem.classList.add("expanded");
+			}
+		});
+	});
 
 	// Add event listeners to follow buttons
-    document.querySelectorAll(".follow-btn").forEach((btn) => {
-        btn.addEventListener("click", async (e) => {
-            e.preventDefault();
-            const itemId = btn.dataset.itemId;
-            const itemType = btn.dataset.itemType;
-            await toggleFollow(itemId, itemType);
-        });
-    });
+	document.querySelectorAll(".follow-btn").forEach((btn) => {
+		btn.addEventListener("click", async (e) => {
+			e.preventDefault();
+			e.stopPropagation(); // Prevent accordion toggle
+			const itemId = btn.dataset.itemId;
+			const itemType = btn.dataset.itemType;
+			await toggleFollow(itemId, itemType);
+		});
+	});
 }
 
 /* -------------------------
