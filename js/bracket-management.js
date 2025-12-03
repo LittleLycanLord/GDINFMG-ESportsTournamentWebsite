@@ -174,6 +174,24 @@ async function findRootMatchup(eventId) {
 	return rootMatchup || null;
 }
 
+async function findParentMatchup(eventId, currentMatchupId) {
+	// Find the matchup that references the current matchup as side_a or side_b
+	const { data: matchups, error } = await supabase
+		.from("matchups")
+		.select("id, matchup_code, side_a_matchup_id, side_b_matchup_id")
+		.eq("event_id", eventId)
+		.or(`side_a_matchup_id.eq.${currentMatchupId},side_b_matchup_id.eq.${currentMatchupId}`);
+
+	if (error || !matchups || matchups.length === 0) {
+		return null;
+	}
+
+	const parentMatchup = matchups[0];
+	// Determine which side this matchup is on
+	const isLeftSide = parentMatchup.side_a_matchup_id === currentMatchupId;
+	return { matchup: parentMatchup, isLeftSide };
+}
+
 async function createBracket() {
 	if (!selectedEventId) return;
 
@@ -517,26 +535,39 @@ function createMatchupElement(matchup) {
 	const result = matchup.result;
 	const winnerId = result?.winner_participant_id;
 
-	// Determine sides (participant or TBD from matchup)
-	const leftSide = matchup.participant_left ? {
-		name: matchup.participant_left.player?.name || matchup.participant_left.team?.name || "Unknown",
-		id: matchup.side_a_participant_id,
-		code: matchup.participant_left.participant_code
-	} : (matchup.side_a_matchup_id ? {
-		name: "TBD",
-		id: null,
-		code: null
-	} : null);
+	// Determine sides - prioritize participant_id over matchup_id
+	// If participant_id exists, show participant (winner advanced)
+	// Otherwise if matchup_id exists, show TBD
+	// Otherwise show BYE
+	let leftSide = null;
+	if (matchup.side_a_participant_id && matchup.participant_left) {
+		leftSide = {
+			name: matchup.participant_left.player?.name || matchup.participant_left.team?.name || "Unknown",
+			id: matchup.side_a_participant_id,
+			code: matchup.participant_left.participant_code
+		};
+	} else if (matchup.side_a_matchup_id) {
+		leftSide = {
+			name: "TBD",
+			id: null,
+			code: null
+		};
+	}
 
-	const rightSide = matchup.participant_right ? {
-		name: matchup.participant_right.player?.name || matchup.participant_right.team?.name || "Unknown",
-		id: matchup.side_b_participant_id,
-		code: matchup.participant_right.participant_code
-	} : (matchup.side_b_matchup_id ? {
-		name: "TBD",
-		id: null,
-		code: null
-	} : null);
+	let rightSide = null;
+	if (matchup.side_b_participant_id && matchup.participant_right) {
+		rightSide = {
+			name: matchup.participant_right.player?.name || matchup.participant_right.team?.name || "Unknown",
+			id: matchup.side_b_participant_id,
+			code: matchup.participant_right.participant_code
+		};
+	} else if (matchup.side_b_matchup_id) {
+		rightSide = {
+			name: "TBD",
+			id: null,
+			code: null
+		};
+	}
 
 	// Left participant
 	const leftRow = document.createElement("div");
@@ -576,12 +607,19 @@ function createMatchupElement(matchup) {
 	rightRow.appendChild(rightScore);
 	div.appendChild(rightRow);
 
-	// Add click handler to enter results (only if both sides have actual participants)
-	if (leftSide && leftSide.id && rightSide && rightSide.id) {
+	// Add click handler to enter results if both sides are determined
+	// Check if both sides have participant IDs (either originally or advanced from child matchups)
+	const hasLeftParticipant = matchup.side_a_participant_id != null;
+	const hasRightParticipant = matchup.side_b_participant_id != null;
+	
+	if (hasLeftParticipant && hasRightParticipant) {
 		div.style.cursor = "pointer";
 		div.addEventListener("click", () => {
 			openResultModal(matchup, leftSide, rightSide);
 		});
+	} else if (!hasLeftParticipant || !hasRightParticipant) {
+		// Visual indicator that matchup is not ready
+		div.style.opacity = "0.6";
 	}
 
 	return div;
@@ -664,12 +702,11 @@ async function saveMatchResult() {
 	const { data: existingResults, error: fetchError } = await supabase
 		.from("results")
 		.select("id")
-		.eq("matchup_id", currentMatchupId)
-		.single();
+		.eq("matchup_id", currentMatchupId);
 
 	let resultError;
 	
-	if (existingResults) {
+	if (existingResults && existingResults.length > 0) {
 		// Update existing result
 		const { error } = await supabase
 			.from("results")
@@ -679,7 +716,7 @@ async function saveMatchResult() {
 				score_b: parseInt(rightScore),
 				status: "final"
 			})
-			.eq("id", existingResults.id);
+			.eq("id", existingResults[0].id);
 		
 		resultError = error;
 	} else {
@@ -701,6 +738,28 @@ async function saveMatchResult() {
 		console.error("Error saving result:", resultError);
 		alert("Failed to save result: " + resultError.message);
 		return;
+	}
+
+	// Advance winner to parent matchup
+	const parentInfo = await findParentMatchup(selectedEventId, currentMatchupId);
+	if (parentInfo) {
+		const { matchup: parentMatchup, isLeftSide } = parentInfo;
+		
+		// Update parent matchup with winner
+		// Keep matchup_id references for tree traversal, just set participant_id
+		const updateData = isLeftSide 
+			? { side_a_participant_id: winnerParticipantId }
+			: { side_b_participant_id: winnerParticipantId };
+		
+		const { error: advanceError } = await supabase
+			.from("matchups")
+			.update(updateData)
+			.eq("id", parentMatchup.id);
+		
+		if (advanceError) {
+			console.error("Error advancing winner:", advanceError);
+			// Don't fail the whole operation if advancement fails
+		}
 	}
 
 	alert("Result saved successfully!");
