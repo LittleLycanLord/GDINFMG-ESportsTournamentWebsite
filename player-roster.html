@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Players - GDINFMG Esports</title>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"
+		/>
+		<!-- Custom Theme CSS -->
+		<link rel="stylesheet" href="css/theme.css" />
+	</head>
+	<body>
+		<!-- Navigation -->
+		<nav class="navbar" role="navigation" aria-label="main navigation">
+			<div class="navbar-brand">
+				<a class="navbar-item" href="index.html">
+					<strong>GDINFMG Esports</strong>
+				</a>
+			</div>
+
+			<div class="navbar-menu">
+				<div class="navbar-start">
+					<a class="navbar-item" href="index.html"> Home </a>
+					<a class="navbar-item" href="team-roster.html"> Teams </a>
+					<a class="navbar-item" href="player-roster.html"> Players </a>
+					<a
+						class="navbar-item"
+						href="tournament-management.html"
+					>
+						Tournament Management
+					</a>
+					<a
+						class="navbar-item"
+						href="participant-management.html"
+					>
+						Participant Management
+					</a>
+					<a class="navbar-item" href="bracket-management.html">
+						Bracket Management
+					</a>
+				</div>
+
+				<div class="navbar-end">
+					<div class="navbar-item">
+						<div class="buttons">
+							<button id="loginBtn" class="button is-primary">
+								Login
+							</button>
+							<div
+								id="userInfo"
+								style="display: none; align-items: center"
+							>
+								<span
+									id="userName"
+									style="margin-right: 10px"
+								></span>
+								<button id="logoutBtn" class="button is-light">
+									Logout
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Hero Section -->
+		<section class="hero is-medium">
+			<div class="hero-body">
+				<div class="container has-text-centered">
+					<h1 class="title is-1">GDINFMG Affiliated Players</h1>
+					<p class="subtitle is-4">
+						Discover competitive players in the GDINFMG esports community
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Players Section -->
+		<section class="section">
+			<div class="container">
+				<h2 class="title is-2 section-title">Players</h2>
+				<div id="players-list">
+					<div class="box has-background-dark has-text-white">
+						Loading players...
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="footer" style="background-color: #1a1f3a">
+			<div class="content has-text-centered">
+				<p style="color: #ffffff">
+					<strong style="color: #ffffff">GDINFMG Esports</strong> by
+					Team Trailblazers
+				</p>
+			</div>
+		</footer>
+
+		<!-- Login/Signup Modal -->
+		<div id="loginModal" class="modal">
+			<div class="modal-background"></div>
+			<div class="modal-card">
+				<header class="modal-card-head">
+					<p class="modal-card-title">Login / Sign Up</p>
+					<button
+						id="closeLoginModal"
+						class="delete"
+						aria-label="close"
+					></button>
+				</header>
+				<section class="modal-card-body">
+					<div class="tabs is-centered">
+						<ul>
+							<li id="loginTab" class="is-active">
+								<a>Login</a>
+							</li>
+							<li id="signupTab"><a>Sign Up</a></li>
+						</ul>
+					</div>
+
+					<!-- Login Form -->
+					<div id="loginForm">
+						<div class="field">
+							<label class="label">Username</label>
+							<div class="control">
+								<input
+									id="loginUsername"
+									class="input"
+									type="text"
+									placeholder="Enter username"
+								/>
+							</div>
+						</div>
+						<div class="field">
+							<label class="label">Password</label>
+							<div class="control">
+								<input
+									id="loginPassword"
+									class="input"
+									type="password"
+									placeholder="Enter password"
+								/>
+							</div>
+						</div>
+						<div class="field">
+							<div class="control">
+								<button
+									id="submitLoginBtn"
+									class="button is-primary is-fullwidth"
+								>
+									Login
+								</button>
+							</div>
+						</div>
+						<p id="loginError" class="help is-danger"></p>
+					</div>
+
+					<!-- Signup Form -->
+					<div id="signupForm" style="display: none">
+						<div class="field">
+							<label class="label">Username</label>
+							<div class="control">
+								<input
+									id="signupUsername"
+									class="input"
+									type="text"
+									placeholder="Choose username"
+								/>
+							</div>
+						</div>
+						<div class="field">
+							<label class="label">Password</label>
+							<div class="control">
+								<input
+									id="signupPassword"
+									class="input"
+									type="password"
+									placeholder="Choose password"
+								/>
+							</div>
+						</div>
+						<div class="field">
+							<label class="label">Confirm Password</label>
+							<div class="control">
+								<input
+									id="signupPasswordConfirm"
+									class="input"
+									type="password"
+									placeholder="Confirm password"
+								/>
+							</div>
+						</div>
+						<div class="field">
+							<div class="control">
+								<button
+									id="submitSignupBtn"
+									class="button is-primary is-fullwidth"
+								>
+									Sign Up
+								</button>
+							</div>
+						</div>
+						<p id="signupError" class="help is-danger"></p>
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<script type="module" src="js/player-roster.js"></script>
+	</body>
+</html>

@@ -320,8 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// load initial UI
 	renderTournaments();
-	renderTeams();
-	renderPlayers();
 
 	// Event delegation for tournament view links
 	document.addEventListener("click", (e) => {

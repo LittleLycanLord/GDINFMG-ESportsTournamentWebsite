@@ -1,0 +1,379 @@
+/* 
+ * GDINFMG Esports - Centralized Theme Styles
+ * Edit this file to customize colors, fonts, and overall theme
+ */
+
+/* ==================== COLOR VARIABLES ==================== */
+:root {
+	/* Primary Colors */
+	--color-primary: #667eea;
+	--color-primary-dark: #764ba2;
+	--color-secondary: #3273dc;
+
+	/* Background Colors */
+	--bg-body: #0a0e27;
+	--bg-dark: #1a1f3a;
+	--bg-darker: #0d1117;
+	--bg-card: #1a1f3a;
+	--bg-navbar: #1a1f3a;
+	--bg-footer: #1a1f3a;
+
+	/* Text Colors */
+	--text-primary: #ffffff;
+	--text-secondary: #aaaaaa;
+	--text-muted: #888888;
+
+	/* Accent Colors */
+	--color-success: #48c774;
+	--color-danger: #f14668;
+	--color-warning: #ffdd57;
+	--color-info: #3298dc;
+
+	/* Border Colors */
+	--border-color: #667eea;
+	--border-light: #2a2f4a;
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+:root {
+	/* Font Families - Edit these to change fonts site-wide */
+	--font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	--font-heading: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	--font-monospace: 'Courier New', Courier, monospace;
+
+	/* Font Sizes */
+	--font-size-base: 16px;
+	--font-size-small: 14px;
+	--font-size-large: 18px;
+}
+
+/* ==================== GLOBAL STYLES ==================== */
+body {
+	background-color: var(--bg-body);
+	color: var(--text-primary);
+	font-family: var(--font-primary);
+	font-size: var(--font-size-base);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* ==================== NAVBAR STYLES ==================== */
+.navbar {
+	background-color: var(--bg-navbar) !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-item,
+.navbar-link {
+	color: var(--text-primary) !important;
+	transition: background-color 0.2s ease;
+}
+
+.navbar-item:hover,
+.navbar-link:hover {
+	background-color: rgba(102, 126, 234, 0.1) !important;
+	color: var(--color-primary) !important;
+}
+
+.navbar-brand .navbar-item {
+	font-weight: bold;
+	font-size: 1.2rem;
+}
+
+/* ==================== HERO SECTION STYLES ==================== */
+.hero {
+	background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+	position: relative;
+	overflow: hidden;
+}
+
+.hero::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+	animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+.hero .title,
+.hero .subtitle {
+	position: relative;
+	z-index: 1;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== SECTION STYLES ==================== */
+.section {
+	padding: 3rem 1.5rem;
+	flex: 1;
+}
+
+.section-title {
+	border-bottom: 3px solid var(--border-color);
+	padding-bottom: 10px;
+	margin-bottom: 30px;
+	font-family: var(--font-heading);
+	color: var(--text-primary);
+}
+
+/* ==================== CARD STYLES ==================== */
+.card {
+	background-color: var(--bg-card);
+	color: var(--text-primary);
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	overflow: hidden;
+}
+
+.card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.card-header {
+	background-color: var(--bg-dark);
+	border-bottom: 2px solid var(--border-color);
+}
+
+.card-header-title {
+	color: var(--text-primary);
+	font-weight: 600;
+}
+
+.card-content {
+	background-color: var(--bg-card);
+}
+
+.card-footer {
+	border-top: 1px solid var(--border-light);
+	background-color: var(--bg-dark);
+}
+
+.card-footer-item {
+	color: var(--color-secondary);
+	transition: background-color 0.2s ease;
+}
+
+.card-footer-item:hover {
+	background-color: rgba(102, 126, 234, 0.1);
+	color: var(--color-primary);
+}
+
+/* ==================== BOX STYLES ==================== */
+.box {
+	background-color: var(--bg-card);
+	color: var(--text-primary);
+	border-radius: 6px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.box.has-background-dark {
+	background-color: var(--bg-dark);
+}
+
+/* ==================== BUTTON STYLES ==================== */
+.button.is-primary {
+	background-color: var(--color-primary);
+	border-color: transparent;
+	color: white;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.button.is-primary:hover {
+	background-color: var(--color-primary-dark);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.button.is-success {
+	background-color: var(--color-success);
+}
+
+.button.is-danger {
+	background-color: var(--color-danger);
+}
+
+.button.is-info {
+	background-color: var(--color-info);
+}
+
+/* ==================== MODAL STYLES ==================== */
+.modal-card {
+	background-color: var(--bg-card);
+}
+
+.modal-card-head {
+	background-color: var(--bg-dark);
+	border-bottom: 2px solid var(--border-color);
+}
+
+.modal-card-title {
+	color: var(--text-primary);
+}
+
+.modal-card-body {
+	background-color: var(--bg-card);
+}
+
+.modal-card-foot {
+	background-color: var(--bg-dark);
+	border-top: 1px solid var(--border-light);
+}
+
+/* ==================== FORM STYLES ==================== */
+.input,
+.textarea,
+.select select {
+	background-color: var(--bg-dark);
+	border-color: var(--border-light);
+	color: var(--text-primary);
+}
+
+.input:focus,
+.textarea:focus,
+.select select:focus {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 0.125em rgba(102, 126, 234, 0.25);
+}
+
+.label {
+	color: var(--text-primary);
+	font-weight: 600;
+}
+
+/* ==================== TABLE STYLES ==================== */
+.table {
+	background-color: var(--bg-card);
+	color: var(--text-primary);
+}
+
+.table thead th {
+	background-color: var(--bg-dark);
+	color: var(--text-primary);
+	border-bottom: 2px solid var(--border-color);
+}
+
+.table tbody tr {
+	background-color: var(--bg-card);
+	transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+	background-color: rgba(102, 126, 234, 0.1);
+}
+
+.table td {
+	border-color: var(--border-light);
+	color: var(--text-primary);
+}
+
+/* ==================== TABS STYLES ==================== */
+.tabs li.is-active a {
+	border-bottom-color: var(--color-primary);
+	color: var(--color-primary);
+}
+
+.tabs a {
+	color: var(--text-secondary);
+	border-bottom-color: var(--border-light);
+}
+
+.tabs a:hover {
+	color: var(--text-primary);
+	border-bottom-color: var(--border-light);
+}
+
+/* ==================== NOTIFICATION STYLES ==================== */
+.notification {
+	background-color: var(--bg-card);
+	color: var(--text-primary);
+}
+
+.notification.is-info {
+	background-color: var(--color-info);
+	color: white;
+}
+
+.notification.is-success {
+	background-color: var(--color-success);
+	color: white;
+}
+
+.notification.is-danger {
+	background-color: var(--color-danger);
+	color: white;
+}
+
+/* ==================== FOOTER STYLES ==================== */
+.footer {
+	background-color: var(--bg-footer);
+	padding: 2rem 1.5rem;
+	margin-top: auto;
+	border-top: 2px solid var(--border-light);
+}
+
+.footer .content {
+	color: var(--text-secondary);
+}
+
+.footer strong {
+	color: var(--text-primary);
+}
+
+/* ==================== UTILITY CLASSES ==================== */
+.has-text-white {
+	color: var(--text-primary) !important;
+}
+
+.has-text-grey,
+.has-text-grey-light {
+	color: var(--text-secondary) !important;
+}
+
+.has-background-dark {
+	background-color: var(--bg-dark) !important;
+}
+
+/* ==================== RESPONSIVE ADJUSTMENTS ==================== */
+@media screen and (max-width: 768px) {
+	.section {
+		padding: 2rem 1rem;
+	}
+
+	.hero.is-medium .hero-body {
+		padding: 6rem 1.5rem;
+	}
+}
+
+/* ==================== CUSTOM SCROLLBAR ==================== */
+::-webkit-scrollbar {
+	width: 12px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--bg-dark);
+	border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-primary);
+}
