@@ -60,7 +60,7 @@ async function initAuthUI() {
 		}
 
 		// synthesize an email for Supabase auth (client-only mapping)
-		const email = username + "@local.gdin";
+		const email = username + "@gmail.com";
 
 		try {
 			const { data, error } = await supabase.auth.signInWithPassword({
@@ -107,7 +107,7 @@ async function initAuthUI() {
 		}
 
 		// synthesize an email for Supabase auth (client-only mapping)
-		const email = username + "@local.gdin";
+		const email = username + "@gmail.com";
 
 		try {
 			const { data, error } = await supabase.auth.signUp({
@@ -155,16 +155,160 @@ async function checkAuthState() {
 		logoutBtn.style.display = "block";
 		userInfo.style.display = "block";
 		// display the username portion we synthesize (before the @)
+		const userId = data.session.user.id;
 		const email = data.session.user.email || "";
 		const username = email.split("@")[0];
+		localStorage.setItem("currentUserId", userId);
+
 		userName.innerText = username;
 		console.log("User logged in (username):", username);
+		setupRealtimeListeners(userId);
 	} else {
 		// User is not logged in
 		loginBtn.style.display = "block";
 		logoutBtn.style.display = "none";
 		userInfo.style.display = "none";
+		localStorage.removeItem("currentUserId");
 	}
+}
+
+//shows notif to userid's followed items changes
+function setupRealtimeListeners(userId) {
+    // Listen to followed_items table for this user
+    supabase
+        .channel(`user:${userId}:followed`)
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "followed_items",
+                filter: `user_id=eq.${userId}`, // <-- ONLY this user's follows
+            },
+            async (payload) => {
+                console.log("User's followed item changed:", payload);
+                
+                // Determine what type was followed (tournament, team, player)
+                const itemType = payload.new?.item_type;
+                const itemId = payload.new?.item_id;
+
+                if (itemType === "tournament") {
+                    showNotification(
+                        "Tournament Updated",
+                        "A tournament you follow was updated"
+                    );
+                    renderTournaments(); // refresh
+                } else if (itemType === "team") {
+                    showNotification(
+                        "Team Updated",
+                        "A team you follow was updated"
+                    );
+                    renderTeams();
+                } else if (itemType === "player") {
+                    showNotification(
+                        "Player Updated",
+                        "A player you follow was updated"
+                    );
+                    renderPlayers();
+                }
+            }
+        )
+        .subscribe();
+}
+
+// Simple notification toast
+function showNotification(title, message) {
+    const notification = document.createElement("div");
+    notification.className = "notification is-info";
+    notification.style.position = "fixed";
+    notification.style.top = "20px";
+    notification.style.right = "20px";
+    notification.style.zIndex = "9999";
+    notification.style.minWidth = "300px";
+
+    notification.innerHTML = `
+        <button class="delete"></button>
+        <strong>${escapeHtml(title)}</strong><br>
+        ${escapeHtml(message)}
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => notification.remove(), 5000);
+
+    // Close button
+    notification.querySelector(".delete").addEventListener("click", () => {
+        notification.remove();
+    });
+}
+
+// Toggle follow/unfollow an item
+async function toggleFollow(itemId, itemType) {
+    const currentUserId = localStorage.getItem("currentUserId");
+    
+    if (!currentUserId) {
+        alert("Please log in to follow items");
+        return;
+    }
+
+    try {
+        // Check if already following
+        const { data: existing } = await supabase
+            .from("followed_items")
+            .select("id")
+            .eq("user_id", currentUserId)
+            .eq("item_type", itemType)
+            .eq("item_id", itemId)
+            .single();
+
+        if (existing) {
+            // Unfollow
+            const { error } = await supabase
+                .from("followed_items")
+                .delete()
+                .eq("id", existing.id);
+
+            if (error) {
+                console.error("Error unfollowing:", error);
+                alert("Failed to unfollow");
+                return;
+            }
+
+            showNotification("Unfollowed", `You unfollowed this ${itemType}`);
+        } else {
+            // Follow
+            const { error } = await supabase
+                .from("followed_items")
+                .insert([
+                    {
+                        user_id: currentUserId,
+                        item_type: itemType,
+                        item_id: itemId,
+                    },
+                ]);
+
+            if (error) {
+                console.error("Error following:", error);
+                alert("Failed to follow");
+                return;
+            }
+
+            showNotification("Followed", `You're now following this ${itemType}`);
+        }
+
+        // Refresh the view to update button state
+        if (itemType === "tournament") {
+            await renderTournaments();
+        } else if (itemType === "team") {
+            await renderTeams();
+        } else if (itemType === "player") {
+            await renderPlayers();
+        }
+    } catch (err) {
+        console.error("Unexpected error toggling follow:", err);
+        alert("Unexpected error. See console.");
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -241,6 +385,20 @@ export async function renderTournaments() {
 		return;
 	}
 
+	// Get current user ID
+    const currentUserId = localStorage.getItem("currentUserId");
+
+	// Fetch followed items for this user
+    let followedTournamentIds = [];
+    if (currentUserId) {
+        const { data: followedData } = await supabase
+            .from("followed_items")
+            .select("item_id")
+            .eq("user_id", currentUserId)
+            .eq("item_type", "tournament");
+        followedTournamentIds = followedData?.map(f => f.item_id) || [];
+    }
+
 	// render result grid
 	container.innerHTML = "";
 	const cols = document.createElement("div");
@@ -249,6 +407,7 @@ export async function renderTournaments() {
 	data.forEach((t) => {
 		const sch = formatRange(t.schedule);
 		const regDate = formatDateTime(t.registration_date);
+		const isFollowed = followedTournamentIds.includes(t.id);
 		const eventsHtml =
 			t.events && t.events.length
 				? `
@@ -289,6 +448,9 @@ export async function renderTournaments() {
 			}" onclick="window.open('/?tournament=' + '${
 			t.id
 		}', '_blank')">Open</a>
+		${currentUserId ? `<button class="card-footer-item follow-btn" data-item-id="${t.id}" data-item-type="tournament" style="background: none; border: none; color: #3273dc; cursor: pointer;">
+            ${isFollowed ? '★ Following' : '☆ Follow'}
+          </button>` : ''}
         </footer>
       </div>
     `;
@@ -296,6 +458,16 @@ export async function renderTournaments() {
 	});
 
 	container.appendChild(cols);
+
+	// Add event listeners to follow buttons
+    document.querySelectorAll(".follow-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const itemId = btn.dataset.itemId;
+            const itemType = btn.dataset.itemType;
+            await toggleFollow(itemId, itemType);
+        });
+    });
 }
 
 /* -------------------------
@@ -450,11 +622,26 @@ export async function renderTeams() {
 		return;
 	}
 
+	// Get current user ID
+    const currentUserId = localStorage.getItem("currentUserId");
+
+    // Fetch followed items for this user
+    let followedTeamIds = [];
+    if (currentUserId) {
+        const { data: followedData } = await supabase
+            .from("followed_items")
+            .select("item_id")
+            .eq("user_id", currentUserId)
+            .eq("item_type", "team");
+        followedTeamIds = followedData?.map(f => f.item_id) || [];
+    }
+
 	container.innerHTML = "";
 	const cols = document.createElement("div");
 	cols.className = "columns is-multiline";
 
 	data.forEach((team) => {
+		const isFollowed = followedTeamIds.includes(team.id);
 		const col = document.createElement("div");
 		col.className = "column is-one-third";
 		col.innerHTML = `
@@ -464,12 +651,27 @@ export async function renderTeams() {
           <p class="subtitle is-6">Code: ${escapeHtml(team.team_code || "")}</p>
           <p class="has-text-grey">Region: ${escapeHtml(team.region || "")}</p>
         </div>
+		<footer class="card-footer">
+          ${currentUserId ? `<button class="card-footer-item follow-btn" data-item-id="${team.id}" data-item-type="team" style="background: none; border: none; color: #3273dc; cursor: pointer;">
+            ${isFollowed ? '★ Following' : '☆ Follow'}
+          </button>` : ''}
+        </footer>
       </div>
     `;
 		cols.appendChild(col);
 	});
 
 	container.appendChild(cols);
+
+	// Add event listeners to follow buttons
+    document.querySelectorAll(".follow-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const itemId = btn.dataset.itemId;
+            const itemType = btn.dataset.itemType;
+            await toggleFollow(itemId, itemType);
+        });
+    });
 }
 
 /* -------------------------
@@ -500,11 +702,26 @@ export async function renderPlayers() {
 		return;
 	}
 
+	// Get current user ID
+    const currentUserId = localStorage.getItem("currentUserId");
+
+    // Fetch followed items for this user
+    let followedPlayerIds = [];
+    if (currentUserId) {
+        const { data: followedData } = await supabase
+            .from("followed_items")
+            .select("item_id")
+            .eq("user_id", currentUserId)
+            .eq("item_type", "player");
+        followedPlayerIds = followedData?.map(f => f.item_id) || [];
+    }
+
 	container.innerHTML = "";
 	const cols = document.createElement("div");
 	cols.className = "columns is-multiline";
 
 	data.forEach((p) => {
+		const isFollowed = followedPlayerIds.includes(p.id);
 		const col = document.createElement("div");
 		col.className = "column is-one-quarter";
 		col.innerHTML = `
@@ -514,12 +731,27 @@ export async function renderPlayers() {
           <p class="subtitle is-7">Code: ${escapeHtml(p.player_code || "")}</p>
           <p class="has-text-grey">Region: ${escapeHtml(p.region || "")}</p>
         </div>
+		<footer class="card-footer">
+          ${currentUserId ? `<button class="card-footer-item follow-btn" data-item-id="${p.id}" data-item-type="player" style="background: none; border: none; color: #3273dc; cursor: pointer;">
+            ${isFollowed ? '★ Following' : '☆ Follow'}
+          </button>` : ''}
+        </footer>
       </div>
     `;
 		cols.appendChild(col);
 	});
 
 	container.appendChild(cols);
+
+	// Add event listeners to follow buttons
+    document.querySelectorAll(".follow-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const itemId = btn.dataset.itemId;
+            const itemType = btn.dataset.itemType;
+            await toggleFollow(itemId, itemType);
+        });
+    });
 }
 
 /* -------------------------

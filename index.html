@@ -43,13 +43,11 @@
     <div class="navbar-menu">
       <div class="navbar-end">
         <div class="navbar-item">
-          <div class="buttons">
-            <button class="button is-primary" id="loginBtn">Login</button>
-            <button class="button is-light" id="logoutBtn" style="display:none;">Logout</button>
-          </div>
+          <button class="button is-primary" id="loginBtn">Login</button>
         </div>
         <div class="navbar-item" id="userInfo" style="display:none;">
-          <span class="has-text-info">Logged in as: <span id="userName"></span></span>
+          <span id="userName"></span>
+          <button class="button is-danger" id="logoutBtn">Logout</button>
         </div>
       </div>
     </div>
@@ -165,61 +163,102 @@
         <button class="delete" id="closeLoginModal"></button>
       </header>
       <section class="modal-card-body has-background-dark">
-        <div class="tabs is-toggle is-full-width" id="authTabs">
+        <!-- Tabs -->
+        <div class="tabs">
           <ul>
-            <li class="is-active"><a id="loginTab">Login</a></li>
-            <li><a id="signupTab">Sign Up</a></li>
+            <li class="is-active" id="loginTabLi">
+              <a id="loginTab">Login</a>
+            </li>
+            <li id="signupTabLi">
+              <a id="signupTab">Sign Up</a>
+            </li>
           </ul>
         </div>
 
-        <!-- LOGIN FORM -->
-        <div id="loginForm" class="box has-background-grey-dark">
+        <!-- Login Form -->
+        <div id="loginForm">
           <div class="field">
             <label class="label has-text-white">Username</label>
             <div class="control">
-              <input class="input" type="text" id="loginUsername" placeholder="unique username">
+              <input
+                class="input"
+                type="text"
+                id="loginUsername"
+                placeholder="Enter username"
+              />
             </div>
           </div>
+
           <div class="field">
             <label class="label has-text-white">Password</label>
             <div class="control">
-              <input class="input" type="password" id="loginPassword" placeholder="Enter your password">
+              <input
+                class="input"
+                type="password"
+                id="loginPassword"
+                placeholder="Enter password"
+              />
             </div>
           </div>
+
           <div class="field">
             <div class="control">
-              <button class="button is-success is-fullwidth" id="submitLoginBtn">Login</button>
+              <button class="button is-primary" id="submitLoginBtn">
+                Login
+              </button>
             </div>
           </div>
-          <p id="loginError" class="has-text-danger"></p>
+
+          <div id="loginError" class="has-text-danger"></div>
         </div>
 
-        <!-- SIGNUP FORM -->
-        <div id="signupForm" class="box has-background-grey-dark" style="display:none;">
+        <!-- Signup Form -->
+        <div id="signupForm" style="display: none;">
           <div class="field">
             <label class="label has-text-white">Username</label>
             <div class="control">
-              <input class="input" type="text" id="signupUsername" placeholder="unique username">
+              <input
+                class="input"
+                type="text"
+                id="signupUsername"
+                placeholder="Choose a username"
+              />
             </div>
           </div>
+
           <div class="field">
             <label class="label has-text-white">Password</label>
             <div class="control">
-              <input class="input" type="password" id="signupPassword" placeholder="Create a strong password">
+              <input
+                class="input"
+                type="password"
+                id="signupPassword"
+                placeholder="Enter password (min 6 chars)"
+              />
             </div>
           </div>
+
           <div class="field">
             <label class="label has-text-white">Confirm Password</label>
             <div class="control">
-              <input class="input" type="password" id="signupPasswordConfirm" placeholder="Confirm password">
+              <input
+                class="input"
+                type="password"
+                id="signupPasswordConfirm"
+                placeholder="Confirm password"
+              />
             </div>
           </div>
+
           <div class="field">
             <div class="control">
-              <button class="button is-success is-fullwidth" id="submitSignupBtn">Sign Up</button>
+              <button class="button is-primary" id="submitSignupBtn">
+                Sign Up
+              </button>
             </div>
           </div>
-          <p id="signupError" class="has-text-danger"></p>
+
+          <div id="signupError" class="has-text-danger"></div>
         </div>
       </section>
     </div>
