@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - GDINFMG Esports</title>
+
+  <!-- Bulma CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+  <style>
+    body {
+      background: #0d1117;
+      color: #ffffff;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, #111827, #0d1117);
+    }
+
+    .navbar {
+      background-color: #1f2937 !important;
+    }
+
+    .navbar-item, .navbar-link {
+      color: #fff !important;
+    }
+
+    footer {
+      background: #111827;
+      padding: 2rem;
+      color: #aaa;
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 3rem 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .profile-username {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-email {
+      color: #e0e0e0;
+      font-size: 1.1rem;
+    }
+
+    .followed-section {
+      margin-bottom: 3rem;
+    }
+
+    .followed-section-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 0.5rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #a0aec0;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item has-text-weight-bold" href="index.html">GDINFMG Esports</a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="index.html">Home</a>
+        <a class="navbar-item" href="tournament-management.html">Tournament Management</a>
+        <a class="navbar-item" href="participant-management.html">Participant Management</a>
+        <a class="navbar-item" href="bracket-management.html">Bracket Management</a>
+        <a class="navbar-item" href="profile.html">My Profile</a>
+      </div>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <button class="button is-primary" id="loginBtn">Login</button>
+        </div>
+        <div class="navbar-item" id="userInfo" style="display:none;">
+          <span id="userName"></span>
+          <button class="button is-danger" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title has-text-white">My Profile</h1>
+        <h2 class="subtitle has-text-grey-light">
+          View and manage your followed tournaments, teams, and players
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION -->
+  <section class="section">
+    <div class="container">
+
+      <!-- LOGIN REQUIRED MESSAGE -->
+      <div id="login-required-section" style="display: none;">
+        <div class="box has-background-grey-dark has-text-centered">
+          <p class="has-text-white mb-4">You must be logged in to view your profile.</p>
+          <button class="button is-primary is-large" id="loginBtnRequired">Login Now</button>
+        </div>
+      </div>
+
+      <!-- PROFILE CONTENT -->
+      <div id="profile-content" style="display: none;">
+        
+        <!-- PROFILE HEADER -->
+        <div class="profile-header">
+          <div class="profile-username" id="profileUsername">Loading...</div>
+          <div class="profile-email" id="profileEmail"></div>
+        </div>
+
+        <!-- FOLLOWED TOURNAMENTS -->
+        <div class="followed-section">
+          <h2 class="followed-section-title">📅 Followed Tournaments</h2>
+          <div id="followed-tournaments-list">
+            <div class="has-text-white">Loading tournaments...</div>
+          </div>
+        </div>
+
+        <!-- FOLLOWED TEAMS -->
+        <div class="followed-section">
+          <h2 class="followed-section-title">🏆 Followed Teams</h2>
+          <div id="followed-teams-list">
+            <div class="has-text-white">Loading teams...</div>
+          </div>
+        </div>
+
+        <!-- FOLLOWED PLAYERS -->
+        <div class="followed-section">
+          <h2 class="followed-section-title">👤 Followed Players</h2>
+          <div id="followed-players-list">
+            <div class="has-text-white">Loading players...</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LOGIN MODAL (from index.html) -->
+  <div class="modal" id="loginModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head has-background-dark">
+        <p class="modal-card-title has-text-white">Login / Sign Up</p>
+        <button class="delete" id="closeLoginModal"></button>
+      </header>
+      <section class="modal-card-body has-background-dark">
+        <div class="tabs">
+          <ul>
+            <li class="is-active" id="loginTabLi">
+              <a id="loginTab">Login</a>
+            </li>
+            <li id="signupTabLi">
+              <a id="signupTab">Sign Up</a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="loginForm">
+          <div class="field">
+            <label class="label has-text-white">Username</label>
+            <div class="control">
+              <input class="input" type="text" id="loginUsername" placeholder="Enter username" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label has-text-white">Password</label>
+            <div class="control">
+              <input class="input" type="password" id="loginPassword" placeholder="Enter password" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <button class="button is-primary" id="submitLoginBtn">Login</button>
+            </div>
+          </div>
+          <div id="loginError" class="has-text-danger"></div>
+        </div>
+
+        <div id="signupForm" style="display: none;">
+          <div class="field">
+            <label class="label has-text-white">Username</label>
+            <div class="control">
+              <input class="input" type="text" id="signupUsername" placeholder="Choose a username" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label has-text-white">Password</label>
+            <div class="control">
+              <input class="input" type="password" id="signupPassword" placeholder="Enter password (min 6 chars)" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label has-text-white">Confirm Password</label>
+            <div class="control">
+              <input class="input" type="password" id="signupPasswordConfirm" placeholder="Confirm password" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <button class="button is-primary" id="submitSignupBtn">Sign Up</button>
+            </div>
+          </div>
+          <div id="signupError" class="has-text-danger"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer has-text-centered">
+    <p>© <span id="year"></span> GDINFMG Esports Tournament Website</p>
+  </footer>
+
+  <!-- Load profile script as ESM module -->
+  <script type="module" src="js/profile.js"></script>
+  <script>
+    document.getElementById('year').innerText = new Date().getFullYear();
+  </script>
+</body>
+</html>
