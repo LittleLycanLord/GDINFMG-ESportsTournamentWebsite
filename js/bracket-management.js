@@ -426,8 +426,15 @@ async function displayBracket(eventId) {
 		return;
 	}
 
+	// Get the full root matchup data from matchupMap (findRootMatchup only returns partial data)
+	const fullRootMatchup = matchupMap[rootMatchup.id];
+	if (!fullRootMatchup) {
+		container.innerHTML = '<p class="has-text-white">Cannot display bracket: root matchup data missing.</p>';
+		return;
+	}
+
 	// Build rounds by depth-first traversal
-	const rounds = buildRoundsFromTree(rootMatchup, matchupMap, participantMap, resultsMap);
+	const rounds = buildRoundsFromTree(fullRootMatchup, matchupMap, participantMap, resultsMap);
 
 	// Render bracket
 	container.innerHTML = "";
@@ -540,12 +547,21 @@ function createMatchupElement(matchup) {
 	// Otherwise if matchup_id exists, show TBD
 	// Otherwise show BYE
 	let leftSide = null;
-	if (matchup.side_a_participant_id && matchup.participant_left) {
-		leftSide = {
-			name: matchup.participant_left.player?.name || matchup.participant_left.team?.name || "Unknown",
-			id: matchup.side_a_participant_id,
-			code: matchup.participant_left.participant_code
-		};
+	if (matchup.side_a_participant_id) {
+		if (matchup.participant_left) {
+			leftSide = {
+				name: matchup.participant_left.player?.name || matchup.participant_left.team?.name || "Unknown",
+				id: matchup.side_a_participant_id,
+				code: matchup.participant_left.participant_code
+			};
+		} else {
+			// Participant ID exists but not in map (newly advanced) - show placeholder
+			leftSide = {
+				name: "Loading...",
+				id: matchup.side_a_participant_id,
+				code: null
+			};
+		}
 	} else if (matchup.side_a_matchup_id) {
 		leftSide = {
 			name: "TBD",
@@ -555,12 +571,21 @@ function createMatchupElement(matchup) {
 	}
 
 	let rightSide = null;
-	if (matchup.side_b_participant_id && matchup.participant_right) {
-		rightSide = {
-			name: matchup.participant_right.player?.name || matchup.participant_right.team?.name || "Unknown",
-			id: matchup.side_b_participant_id,
-			code: matchup.participant_right.participant_code
-		};
+	if (matchup.side_b_participant_id) {
+		if (matchup.participant_right) {
+			rightSide = {
+				name: matchup.participant_right.player?.name || matchup.participant_right.team?.name || "Unknown",
+				id: matchup.side_b_participant_id,
+				code: matchup.participant_right.participant_code
+			};
+		} else {
+			// Participant ID exists but not in map (newly advanced) - show placeholder
+			rightSide = {
+				name: "Loading...",
+				id: matchup.side_b_participant_id,
+				code: null
+			};
+		}
 	} else if (matchup.side_b_matchup_id) {
 		rightSide = {
 			name: "TBD",
