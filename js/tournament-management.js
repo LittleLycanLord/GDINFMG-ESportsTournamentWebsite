@@ -133,6 +133,17 @@ async function loadTournamentDetailsForEdit(tournamentId) {
 	// Set editing mode
 	editingTournamentId = tournamentId;
 
+	// Show all tournament fields (in case they were hidden from event edit mode)
+	document.getElementById("tname").parentElement.parentElement.style.display = "block";
+	document.getElementById("tlocation").parentElement.parentElement.style.display = "block";
+	
+	// Show the entire schedule columns container (both start and end fields)
+	const scheduleStartField = document.querySelector("#schedule_start");
+	const scheduleColumnsContainer = scheduleStartField.closest(".columns");
+	if (scheduleColumnsContainer) {
+		scheduleColumnsContainer.style.display = "flex";
+	}
+	
 	// Hide events section but show sponsors
 	document.querySelector("#events-container").parentElement.style.display = "none";
 	document.querySelector("#tournament-sponsors-section").style.display = "block";
@@ -209,7 +220,14 @@ async function loadEventsForEdit(tournamentId) {
 	document.getElementById("tname").value = data.name;
 	document.getElementById("tname").parentElement.parentElement.style.display = "none";
 	document.getElementById("tlocation").parentElement.parentElement.style.display = "none";
-	document.querySelector("#schedule_start").parentElement.parentElement.parentElement.style.display = "none";
+	
+	// Hide the entire schedule columns container (both start and end fields)
+	const scheduleStartField = document.querySelector("#schedule_start");
+	const scheduleColumnsContainer = scheduleStartField.closest(".columns");
+	if (scheduleColumnsContainer) {
+		scheduleColumnsContainer.style.display = "none";
+	}
+	
 	document.querySelector("#tournament-sponsors-section").style.display = "none";
 
 	// Show events section
@@ -225,7 +243,14 @@ async function loadEventsForEdit(tournamentId) {
 	if (data.events && data.events.length > 0) {
 		for (const event of data.events) {
 			addEventForm();
-			const eventBox = document.querySelector(`[data-event-id="${eventCounter}"]`);
+			const currentEventId = eventCounter;
+			const eventBox = document.querySelector(`[data-event-id="${currentEventId}"]`);
+			
+			if (!eventBox) {
+				console.error(`Could not find event box with id ${currentEventId}`);
+				continue;
+			}
+			
 			eventBox.querySelector(".event-name").value = event.name;
 			eventBox.querySelector(".event-game").value = event.game_title;
 			eventBox.querySelector(".event-location").value = event.location;
@@ -242,12 +267,10 @@ async function loadEventsForEdit(tournamentId) {
 
 			// Load prizes for this event
 			if (event.prize_distributions && event.prize_distributions.length > 0) {
-				const currentEventId = eventCounter;
 				for (const prize of event.prize_distributions) {
 					addPrizeForm(currentEventId);
 					
-					const currentEventBox = document.querySelector(`[data-event-id="${currentEventId}"]`);
-					const prizesContainer = currentEventBox.querySelector(".prizes-container");
+					const prizesContainer = eventBox.querySelector(".prizes-container");
 					const prizeBoxes = prizesContainer.querySelectorAll(".box[data-prize-id]");
 					const lastPrizeBox = prizeBoxes[prizeBoxes.length - 1];
 					
@@ -264,12 +287,10 @@ async function loadEventsForEdit(tournamentId) {
 
 			// Load event sponsors
 			if (event.sponsors && event.sponsors.length > 0) {
-				const currentEventId = eventCounter;
 				for (const sponsor of event.sponsors) {
 					addEventSponsorForm(currentEventId);
 					
-					const currentEventBox = document.querySelector(`[data-event-id="${currentEventId}"]`);
-					const sponsorsContainer = currentEventBox.querySelector(".event-sponsors-container");
+					const sponsorsContainer = eventBox.querySelector(".event-sponsors-container");
 					const sponsorBoxes = sponsorsContainer.querySelectorAll("[data-event-sponsor-id]");
 					const lastSponsorBox = sponsorBoxes[sponsorBoxes.length - 1];
 					
@@ -724,8 +745,8 @@ function collectEventData() {
 		if (name && game) {
 			let scheduleRange;
 			if (scheduleStart && scheduleEnd) {
-				const sISO = toUTCISOString(scheduleStart);
-				const eISO = toUTCISOString(scheduleEnd);
+				const sISO = toUTCISOString(scheduleStart, true); // true = start of day
+				const eISO = toUTCISOString(scheduleEnd, false); // false = end of day
 				scheduleRange = `[${sISO},${eISO})`;
 			} else {
 				const start = new Date();
@@ -838,8 +859,8 @@ async function handleCreateTournament() {
 
 	let scheduleRange;
 	if (scheduleStart && scheduleEnd) {
-		const sISO = toUTCISOString(scheduleStart);
-		const eISO = toUTCISOString(scheduleEnd);
+		const sISO = toUTCISOString(scheduleStart, true); // Start of day
+		const eISO = toUTCISOString(scheduleEnd, false); // End of day
 		scheduleRange = `[${sISO},${eISO})`;
 	} else {
 		const start = new Date();
@@ -1302,7 +1323,13 @@ function clearForm() {
 	// Show all hidden fields
 	document.getElementById("tname").parentElement.parentElement.style.display = "block";
 	document.getElementById("tlocation").parentElement.parentElement.style.display = "block";
-	document.querySelector("#schedule_start").parentElement.parentElement.parentElement.style.display = "flex";
+	
+	// Show the entire schedule columns container (both start and end fields)
+	const scheduleStartField = document.querySelector("#schedule_start");
+	const scheduleColumnsContainer = scheduleStartField.closest(".columns");
+	if (scheduleColumnsContainer) {
+		scheduleColumnsContainer.style.display = "flex";
+	}
 	document.querySelector("#events-container").parentElement.style.display = "block";
 	document.querySelector("#tournament-sponsors-section").style.display = "block";
 	
@@ -1323,13 +1350,15 @@ function clearForm() {
 	document.getElementById("createTournamentBtn").textContent = "Create Tournament with Events";
 }
 
-function toUTCISOString(inputValue) {
+function toUTCISOString(inputValue, isStartTime = true) {
 	try {
 		let d;
 		if (inputValue.includes("T")) {
 			d = new Date(inputValue);
 		} else {
-			d = new Date(inputValue + "T09:00:00");
+			// If no time specified, use start of day for start times, end of day for end times
+			const timeString = isStartTime ? "T09:00:00" : "T23:59:59";
+			d = new Date(inputValue + timeString);
 		}
 		return d.toISOString();
 	} catch (e) {

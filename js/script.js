@@ -356,7 +356,8 @@ export async function renderTournaments() {
       schedule,
       created_at,
       updated_at,
-      events:events(id, event_code, name, game_title, schedule)
+      events:events(id, event_code, name, game_title, schedule),
+      sponsors:sponsors!sponsors_tournament_id_fkey(id, name, website)
     `
 		)
 		.order("registration_date", { ascending: true });
@@ -419,6 +420,25 @@ export async function renderTournaments() {
           </div>`
 				: `<div class="tournament-detail-item"><p class="has-text-grey">No events scheduled</p></div>`;
 
+		const sponsorsHtml =
+			t.sponsors && t.sponsors.length
+				? `
+          <div class="tournament-detail-item">
+            <strong class="detail-label">Sponsors</strong>
+            <ul class="event-list">
+              ${t.sponsors
+					.map(
+						(s) =>
+							`<li>
+								<span class="event-name">${escapeHtml(s.name)}</span>
+								${s.website ? `<a href="${escapeHtml(s.website)}" target="_blank" class="event-game" style="text-decoration: underline;">${escapeHtml(s.website)}</a>` : ''}
+							</li>`
+					)
+					.join("")}
+            </ul>
+          </div>`
+				: `<div class="tournament-detail-item"><p class="has-text-grey">No sponsors</p></div>`;
+
 		const tournamentItem = document.createElement("div");
 		tournamentItem.className = "tournament-item";
 		tournamentItem.dataset.tournamentId = t.id;
@@ -449,10 +469,7 @@ export async function renderTournaments() {
             <p>${escapeHtml(t.location || "TBD")}</p>
           </div>
           ${eventsHtml}
-          <div class="tournament-detail-item">
-            <strong class="detail-label">Sponsors</strong>
-            <p class="has-text-grey">Coming soon</p>
-          </div>
+          ${sponsorsHtml}
         </div>
         <div class="tournament-actions">
           ${currentUserId ? `<button class="button is-small follow-btn" data-item-id="${t.id}" data-item-type="tournament">

@@ -1,0 +1,123 @@
+-- Extensions required
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Table: public.tournaments
+CREATE TABLE IF NOT EXISTS public.tournaments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_code text,
+  name text,
+  registration_date timestamptz,
+  location text,
+  schedule tstzrange,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Table: public.events
+CREATE TABLE IF NOT EXISTS public.events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_id uuid,
+  event_code text,
+  name text,
+  registration_date timestamptz,
+  game_title text,
+  location text,
+  schedule tstzrange,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Table: public.teams
+CREATE TABLE IF NOT EXISTS public.teams (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  team_code text,
+  name text,
+  registration_date timestamptz,
+  region text,
+  leader_player_id uuid,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Table: public.players
+CREATE TABLE IF NOT EXISTS public.players (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  player_code text,
+  name text,
+  registration_date timestamptz,
+  region text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Table: public.participants
+CREATE TABLE IF NOT EXISTS public.participants (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  participant_code text,
+  player_id uuid,
+  team_id uuid,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Table: public.team_members
+CREATE TABLE IF NOT EXISTS public.team_members (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  team_id uuid,
+  player_id uuid,
+  joined_at timestamptz,
+  left_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Table: public.event_participants
+CREATE TABLE IF NOT EXISTS public.event_participants (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id uuid,
+  participant_id uuid,
+  seed integer DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Table: public.matchups
+CREATE TABLE IF NOT EXISTS public.matchups (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  matchup_code text UNIQUE,
+  event_id uuid,
+  side_a_participant_id uuid,
+  side_b_participant_id uuid,
+  side_a_matchup_id uuid,
+  side_b_matchup_id uuid,
+  result_id uuid,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Table: public.results
+CREATE TABLE IF NOT EXISTS public.results (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  matchup_id uuid,
+  winner_participant_id uuid,
+  score_a integer,
+  score_b integer,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'final'::text, 'in_progress'::text, 'cancelled'::text])),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Table: public.prize_distributions
+CREATE TABLE IF NOT EXISTS public.prize_distributions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  distribution_code text,
+  event_id uuid,
+  placement text,
+  prize_description text,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Table: public.sponsors
+CREATE TABLE IF NOT EXISTS public.sponsors (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text,
+  website text DEFAULT ''::text,
+  tournament_id uuid,
+  event_id uuid
+);

@@ -1,0 +1,71 @@
+-- events.tournament_id -> tournaments.id
+ALTER TABLE IF EXISTS public.events
+  ADD CONSTRAINT fk_events_tournament FOREIGN KEY (tournament_id) REFERENCES public.tournaments(id) ON DELETE SET NULL;
+
+-- teams.leader_player_id -> players.id
+ALTER TABLE IF EXISTS public.teams
+  ADD CONSTRAINT fk_teams_leader_player FOREIGN KEY (leader_player_id) REFERENCES public.players(id) ON DELETE SET NULL;
+
+-- participants.player_id -> players.id
+ALTER TABLE IF EXISTS public.participants
+  ADD CONSTRAINT fk_participant_player FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE SET NULL;
+
+-- participants.team_id -> teams.id
+ALTER TABLE IF EXISTS public.participants
+  ADD CONSTRAINT fk_participant_team FOREIGN KEY (team_id) REFERENCES public.teams(id) ON DELETE SET NULL;
+
+-- team_members.team_id -> teams.id
+ALTER TABLE IF EXISTS public.team_members
+  ADD CONSTRAINT fk_tm_team FOREIGN KEY (team_id) REFERENCES public.teams(id) ON DELETE CASCADE;
+
+-- team_members.player_id -> players.id
+ALTER TABLE IF EXISTS public.team_members
+  ADD CONSTRAINT fk_tm_player FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
+
+-- event_participants.event_id -> events.id
+ALTER TABLE IF EXISTS public.event_participants
+  ADD CONSTRAINT fk_ep_event FOREIGN KEY (event_id) REFERENCES public.events(id) ON DELETE CASCADE;
+
+-- event_participants.participant_id -> participants.id
+ALTER TABLE IF EXISTS public.event_participants
+  ADD CONSTRAINT fk_ep_participant FOREIGN KEY (participant_id) REFERENCES public.participants(id) ON DELETE CASCADE;
+
+-- matchups.event_id -> events.id
+ALTER TABLE IF EXISTS public.matchups
+  ADD CONSTRAINT fk_matchups_event FOREIGN KEY (event_id) REFERENCES public.events(id) ON DELETE SET NULL;
+
+-- matchups.side_a_participant_id -> participants.id
+ALTER TABLE IF EXISTS public.matchups
+  ADD CONSTRAINT fk_matchups_side_a_participant FOREIGN KEY (side_a_participant_id) REFERENCES public.participants(id) ON DELETE SET NULL;
+
+-- matchups.side_b_participant_id -> participants.id
+ALTER TABLE IF EXISTS public.matchups
+  ADD CONSTRAINT fk_matchups_side_b_participant FOREIGN KEY (side_b_participant_id) REFERENCES public.participants(id) ON DELETE SET NULL;
+
+-- matchups.side_a_matchup_id -> matchups.id (self-ref)
+ALTER TABLE IF EXISTS public.matchups
+  ADD CONSTRAINT fk_matchups_side_a_matchup FOREIGN KEY (side_a_matchup_id) REFERENCES public.matchups(id) ON DELETE SET NULL;
+
+-- matchups.side_b_matchup_id -> matchups.id (self-ref)
+ALTER TABLE IF EXISTS public.matchups
+  ADD CONSTRAINT fk_matchups_side_b_matchup FOREIGN KEY (side_b_matchup_id) REFERENCES public.matchups(id) ON DELETE SET NULL;
+
+-- results.matchup_id -> matchups.id
+ALTER TABLE IF EXISTS public.results
+  ADD CONSTRAINT fk_results_matchup FOREIGN KEY (matchup_id) REFERENCES public.matchups(id) ON DELETE CASCADE;
+
+-- results.winner_participant_id -> participants.id
+ALTER TABLE IF EXISTS public.results
+  ADD CONSTRAINT fk_results_winner_participant FOREIGN KEY (winner_participant_id) REFERENCES public.participants(id) ON DELETE SET NULL;
+
+-- prize_distributions.event_id -> events.id
+ALTER TABLE IF EXISTS public.prize_distributions
+  ADD CONSTRAINT fk_pd_event FOREIGN KEY (event_id) REFERENCES public.events(id) ON DELETE SET NULL;
+
+-- sponsors.tournament_id -> tournaments.id
+ALTER TABLE IF EXISTS public.sponsors
+  ADD CONSTRAINT sponsors_tournament_id_fkey FOREIGN KEY (tournament_id) REFERENCES public.tournaments(id) ON DELETE SET NULL;
+
+-- sponsors.event_id -> events.id
+ALTER TABLE IF EXISTS public.sponsors
+  ADD CONSTRAINT sponsors_event_id_fkey FOREIGN KEY (event_id) REFERENCES public.events(id) ON DELETE SET NULL;

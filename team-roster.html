@@ -81,7 +81,13 @@
 		<!-- Teams Section -->
 		<section class="section">
 			<div class="container">
-				<h2 class="title is-2 section-title">Teams</h2>
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+					<h2 class="title is-2 section-title" style="margin-bottom: 0;">Teams</h2>
+					<button id="openRegisterTeamBtn" class="button is-primary">
+						<span class="icon"><span>➕</span></span>
+						<span>Register Team</span>
+					</button>
+				</div>
 				<div id="teams-list">
 					<div class="box has-background-dark has-text-white">
 						Loading teams...
@@ -207,6 +213,70 @@
 						<p id="signupError" class="help is-danger"></p>
 					</div>
 				</section>
+			</div>
+		</div>
+
+		<!-- Register Team Modal -->
+		<div id="registerTeamModal" class="modal">
+			<div class="modal-background"></div>
+			<div class="modal-card">
+				<header class="modal-card-head">
+					<p class="modal-card-title">Register New Team</p>
+					<button id="closeRegisterTeamModal" class="delete" aria-label="close"></button>
+				</header>
+				<section class="modal-card-body">
+					<div class="field">
+						<label class="label">Team Name *</label>
+						<div class="control">
+							<input id="teamName" class="input" type="text" placeholder="Enter team name" required />
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Region *</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select id="teamRegion" required>
+									<option value="">Select region</option>
+									<option value="NA">North America</option>
+									<option value="EU">Europe</option>
+									<option value="ASIA">Asia</option>
+									<option value="SEA">Southeast Asia</option>
+									<option value="OCE">Oceania</option>
+									<option value="SA">South America</option>
+									<option value="OTHER">Other</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Team Leader</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select id="teamLeader">
+									<option value="">Select team leader (optional)</option>
+								</select>
+							</div>
+						</div>
+						<p class="help">The team leader will be automatically added as a team member</p>
+					</div>
+					<div class="field">
+						<label class="label">Team Members</label>
+						<div class="control">
+							<div class="select is-multiple is-fullwidth" style="width: 100%;">
+								<select id="teamMembers" multiple size="8" style="width: 100%;">
+									<option value="" disabled>Loading players...</option>
+								</select>
+							</div>
+						</div>
+						<p class="help">Hold Ctrl (Cmd on Mac) to select multiple players</p>
+					</div>
+					<p id="teamRegisterError" class="help is-danger"></p>
+					<p id="teamRegisterSuccess" class="help is-success"></p>
+				</section>
+				<footer class="modal-card-foot">
+					<button id="submitTeamBtn" class="button is-primary">Register Team</button>
+					<button id="cancelTeamBtn" class="button">Cancel</button>
+				</footer>
 			</div>
 		</div>
 

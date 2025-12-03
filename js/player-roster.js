@@ -351,6 +351,96 @@ async function toggleFollow(itemId, itemType) {
 }
 
 /* -------------------------
+   PLAYER REGISTRATION
+   ------------------------- */
+function initPlayerRegistration() {
+	const openBtn = document.getElementById("openRegisterPlayerBtn");
+	const closeBtn = document.getElementById("closeRegisterPlayerModal");
+	const cancelBtn = document.getElementById("cancelPlayerBtn");
+	const submitBtn = document.getElementById("submitPlayerBtn");
+	const modal = document.getElementById("registerPlayerModal");
+	const errorEl = document.getElementById("playerRegisterError");
+	const successEl = document.getElementById("playerRegisterSuccess");
+
+	// Open modal
+	openBtn.addEventListener("click", () => {
+		modal.classList.add("is-active");
+	});
+
+	// Close modal
+	const closeModal = () => {
+		modal.classList.remove("is-active");
+		// Clear form
+		document.getElementById("playerName").value = "";
+		document.getElementById("playerRegion").value = "";
+		errorEl.textContent = "";
+		successEl.textContent = "";
+	};
+
+	closeBtn.addEventListener("click", closeModal);
+	cancelBtn.addEventListener("click", closeModal);
+
+	// Close on background click
+	modal.querySelector(".modal-background").addEventListener("click", closeModal);
+
+	// Submit registration
+	submitBtn.addEventListener("click", async () => {
+		const name = document.getElementById("playerName").value.trim();
+		const region = document.getElementById("playerRegion").value;
+
+		errorEl.textContent = "";
+		successEl.textContent = "";
+
+		// Validation
+		if (!name) {
+			errorEl.textContent = "Player name is required";
+			return;
+		}
+
+		if (!region) {
+			errorEl.textContent = "Region is required";
+			return;
+		}
+
+		try {
+			submitBtn.classList.add("is-loading");
+
+			// Insert player with current timestamp as registration_date
+			const { data, error } = await supabase
+				.from("players")
+				.insert([
+					{
+						name,
+						region,
+						registration_date: new Date().toISOString(),
+					},
+				])
+				.select();
+
+			submitBtn.classList.remove("is-loading");
+
+			if (error) {
+				console.error("Error registering player:", error);
+				errorEl.textContent = "Failed to register player: " + error.message;
+				return;
+			}
+
+			successEl.textContent = "Player registered successfully!";
+			
+			// Refresh player list
+			await renderPlayers();
+
+			// Close modal after 1.5 seconds
+			setTimeout(closeModal, 1500);
+		} catch (err) {
+			submitBtn.classList.remove("is-loading");
+			console.error("Unexpected error:", err);
+			errorEl.textContent = "Unexpected error occurred. Please try again.";
+		}
+	});
+}
+
+/* -------------------------
    UTILITIES
    ------------------------- */
 function escapeHtml(unsafe) {
@@ -370,4 +460,5 @@ document.addEventListener("DOMContentLoaded", () => {
 	initAuthUI();
 	checkAuthState();
 	renderPlayers();
+	initPlayerRegistration();
 });
